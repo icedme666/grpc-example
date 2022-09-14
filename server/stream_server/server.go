@@ -1,14 +1,16 @@
 package main
 
 import (
-	"github.com/EDDYCJY/go-grpc-example/proto"
 	"google.golang.org/grpc"
 	"io"
 	"log"
 	"net"
+	pb "xiamei.guo/grpc-example/proto"
 )
 
-type StreamService struct{}
+type StreamService struct {
+	pb.StreamServiceServer
+}
 
 const (
 	PORT = "9002"
@@ -16,7 +18,7 @@ const (
 
 func main() {
 	server := grpc.NewServer()
-	proto.RegisterStreamServiceServer(server, &StreamService{})
+	pb.RegisterStreamServiceServer(server, &StreamService{})
 	lis, err := net.Listen("tcp", ":"+PORT)
 	if err != nil {
 		log.Fatalf("net.Listen err: %v", err)
@@ -24,10 +26,10 @@ func main() {
 	server.Serve(lis)
 }
 
-func (s *StreamService) List(r *proto.StreamRequest, stream proto.StreamService_ListServer) error {
+func (s *StreamService) List(r *pb.StreamRequest, stream pb.StreamService_ListServer) error {
 	for n := 0; n <= 6; n++ {
-		err := stream.Send(&proto.StreamResponse{
-			Pt: &proto.StreamPoint{
+		err := stream.Send(&pb.StreamResponse{
+			Pt: &pb.StreamPoint{
 				Name:  r.Pt.Name,
 				Value: r.Pt.Value + int32(n),
 			},
@@ -39,12 +41,12 @@ func (s *StreamService) List(r *proto.StreamRequest, stream proto.StreamService_
 	return nil
 }
 
-func (s *StreamService) Record(stream proto.StreamService_RecordServer) error {
+func (s *StreamService) Record(stream pb.StreamService_RecordServer) error {
 	for {
 		//对每一个 Recv 都进行了处理，当发现 io.EOF (流关闭) 后，需要将最终的响应结果发送给客户端，同时关闭正在另外一侧等待的 Recv
 		r, err := stream.Recv()
 		if err == io.EOF {
-			return stream.SendAndClose(&proto.StreamResponse{Pt: &proto.StreamPoint{Name: "gRPC Stream Server: Record", Value: 1}})
+			return stream.SendAndClose(&pb.StreamResponse{Pt: &pb.StreamPoint{Name: "gRPC Stream Server: Record", Value: 1}})
 		}
 		if err != nil {
 			return err
@@ -55,11 +57,11 @@ func (s *StreamService) Record(stream proto.StreamService_RecordServer) error {
 	return nil
 }
 
-func (s *StreamService) Route(stream proto.StreamService_RouteServer) error {
+func (s *StreamService) Route(stream pb.StreamService_RouteServer) error {
 	n := 0
 	for {
-		err := stream.Send(&proto.StreamResponse{
-			Pt: &proto.StreamPoint{
+		err := stream.Send(&pb.StreamResponse{
+			Pt: &pb.StreamPoint{
 				Name:  "gPRC Stream Client: Route",
 				Value: int32(n),
 			},

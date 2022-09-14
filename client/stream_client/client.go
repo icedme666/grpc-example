@@ -2,10 +2,10 @@ package main
 
 import (
 	"context"
-	"github.com/EDDYCJY/go-grpc-example/proto"
 	"google.golang.org/grpc"
 	"io"
 	"log"
+	pb "xiamei.guo/grpc-example/proto"
 )
 
 const (
@@ -19,22 +19,22 @@ func main() {
 	}
 	defer conn.Close()
 
-	client := proto.NewStreamServiceClient(conn)
-	err = printLists(client, &proto.StreamRequest{Pt: &proto.StreamPoint{Name: "gRPC Stream Client: List", Value: 2022}})
+	client := pb.NewStreamServiceClient(conn)
+	err = printLists(client, &pb.StreamRequest{Pt: &pb.StreamPoint{Name: "gRPC Stream Client: List", Value: 2022}})
 	if err != nil {
 		log.Fatalf("printLists.err: %v", err)
 	}
-	err = printRecord(client, &proto.StreamRequest{Pt: &proto.StreamPoint{Name: "gRPC Stream Client: Record", Value: 2022}})
+	err = printRecord(client, &pb.StreamRequest{Pt: &pb.StreamPoint{Name: "gRPC Stream Client: Record", Value: 2022}})
 	if err != nil {
 		log.Fatalf("printRecord.err: %v", err)
 	}
-	err = printRoute(client, &proto.StreamRequest{Pt: &proto.StreamPoint{Name: "gRPC Stream Client: Route", Value: 2022}})
+	err = printRoute(client, &pb.StreamRequest{Pt: &pb.StreamPoint{Name: "gRPC Stream Client: Route", Value: 2022}})
 	if err != nil {
 		log.Fatalf("printRoute.err: %v", err)
 	}
 }
 
-func printLists(client proto.StreamServiceClient, r *proto.StreamRequest) error {
+func printLists(client pb.StreamServiceClient, r *pb.StreamRequest) error {
 	stream, err := client.List(context.Background(), r)
 	if err != nil {
 		return err
@@ -53,7 +53,7 @@ func printLists(client proto.StreamServiceClient, r *proto.StreamRequest) error 
 	return nil
 }
 
-func printRecord(client proto.StreamServiceClient, r *proto.StreamRequest) error {
+func printRecord(client pb.StreamServiceClient, r *pb.StreamRequest) error {
 	stream, err := client.Record(context.Background())
 	if err != nil {
 		return err
@@ -75,7 +75,7 @@ func printRecord(client proto.StreamServiceClient, r *proto.StreamRequest) error
 	return nil
 }
 
-func printRoute(client proto.StreamServiceClient, r *proto.StreamRequest) error {
+func printRoute(client pb.StreamServiceClient, r *pb.StreamRequest) error {
 	stream, err := client.Route(context.Background())
 	if err != nil {
 		return err
