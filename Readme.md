@@ -31,10 +31,30 @@
   3. 校验 ServerName 是否可用、有效
 
 # 拦截器
-  
+* 功能：每个 RPC 方法的前或后做某些事情
+* RPC方法与拦截器的对应：
+  + 普通方法：一元拦截器（grpc.UnaryInterceptor）
+    - 实现 UnaryServerInterceptor 方法，形参如下：
+      - ctx context.Context：请求上下文
+      - req interface{}：RPC 方法的请求参数
+      - info *UnaryServerInfo：RPC 方法的所有信息
+      - handler UnaryHandler：RPC 方法本身
+  + 流方法：流拦截器（grpc.StreamInterceptor）
+* 多个拦截器：开源项目go-grpc-middleware
+
 # HTTP接口
+* 原理：gRPC 的协议是基于 HTTP/2 的，因此应用程序能够在单个 TCP 端口上提供 HTTP/1.1 和 gRPC 接口服务（两种不同的流量）
+* 流程
+  1. 检测请求协议是否为 HTTP/2
+  2. 判断 Content-Type 是否为 application/grpc（gRPC 的默认标识位）
+  3. 根据协议的不同转发到不同的服务处理
 
 # 对RPC自定义认证
+* PerRPCCredentials
+  + 功能： gRPC 默认提供用于自定义认证的接口，作用是将所需的安全认证信息添加到每个 RPC 方法的上下文中
+  + 方法：
+    - GetRequestMetadata：获取当前请求认证所需的元数据（metadata）
+    - RequireTransportSecurity：是否需要基于 TLS 认证进行安全传输
 
 # GRPC Deadlines
 
