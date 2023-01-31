@@ -34,7 +34,7 @@ func main() {
 		RootCAs:      certPool,
 	})
 
-	////创建与给定目标（服务端）的连接交互
+	//创建与给定目标（服务端）的连接交互
 	conn, err := grpc.Dial(":"+PORT, grpc.WithTransportCredentials(c)) //WithTransportCredentials()返回一个配置连接的 DialOption 选项
 	if err != nil {
 		log.Fatalf("grpc.Dail err: %v", err)
